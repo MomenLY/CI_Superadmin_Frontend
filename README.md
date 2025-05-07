@@ -1,44 +1,104 @@
-eThis project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Onion-backend
 
-## Available Scripts
+This project is created with the [NestJS](https://github.com/nestjs/nest) framework. Therefore, please ensure that [nest-cli](https://docs.nestjs.com/cli/overview) is installed on your system before beginning development.
 
-In the project directory, you can run:
+## Installation
 
-### `npm start`
+```bash
+$ npm install
+```
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Duplicate the example.env file as .env
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
 
-### `npm run test`
+## Running the app
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# development
+$ npm run start
 
-### `npm run run build`
+# watch mode
+$ npm run start:dev
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# production mode
+$ npm run start:prod
+```
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Test
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# unit tests
+$ npm run test
 
-### `npm run eject`
+# e2e tests
+$ npm run test:e2e
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# test coverage
+$ npm run test:cov
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Multi-tenancy(SASS)
+To enable multi-tenancy in the application, set the `SASS_APP` environment variable to `true` in the .env file.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Database
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Project is designed with flexibility in mind, allowing you to choose between MongoDB and PostgreSQL as your database management system. Here’s how you can configure your environment to suit your database preferences and setup requirements:
 
-## Learn More
+### Database Selection via Environment Variable
+Determine which database system the project will utilize by setting the `DB_TYPE` environment variable. Specify mongodb for MongoDB or postgres for PostgreSQL, depending on which database system you prefer to work with.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Database Credentials and Configuration
+All necessary database credentials and configurations are managed through the .env file. Make sure to properly set up your .env file with the required database credentials, including the host, port, username, and password.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Database Name Configuration:
+
+- **Non-SaaS Applications**
+
+If your application is not a Software as a Service (SaaS) application, directly provide the actual name of your database by setting the `DATABASE_NAME` environment variable in the .env file.
+
+- **SaaS Applications**
+
+For SaaS applications, it's important to specify the super admin database name by setting the DATABASE_NAME environment variable. The super admin database should be have a collection/table `tenant` with a feild `host`. The host feild type must be a string. 
+
+There is a provider called **TENANT_CONNECTION** that implements dynamic database connectivity for SaaS applications. These connections will be closed after a specific period if no operations are performed through this connection. The duration can be configured using the environment variable `MAX_DB_CONNECTION_DURATION`.
+
+If you want to configure an entity in the tenant database, you should add or modify the line of code in the constructor of that particular entity's service as shown below. 
+
+[[entity]].service.ts
+```
+   export class UsersService {
+        ........
+        constructor(
+            @InjectRepository(User) private userRepository: Repository<User>,
+            @InjectRepository(User) private mongoUserRepository: MongoRepository<User>,
+            private jwtService: JwtService,
+        ) {}
+        .......
+        ......
+    }
+```
+Change to
+
+```
+    export class UsersService {
+        .....
+        private userRepository: Repository<User> & MongoRepository<User>;
+        ........
+        constructor(@Inject(TENANT_CONNECTION) private connection) {
+            this.userRepository = this.connection.getRepository(User);
+        }
+        .......
+        ......
+    }
+
+```
+Otherwise, the entity will reside in the main database.
+
+To ensure proper handling of tenant-based API calls, it's essential to append the x-tenant-id header to every request. Here's an example:
+```
+    curl --location 'localhost:4000/user' \
+    --header 'x-tenant-id: dell' \
+    --header 'Authorization: Bearer <JWT Token>'
+``` 
+
+In this case, "dell" serves as the tenant identifier. For MongoDB setups, the database is created automatically. However, when using PostgreSQL, manual creation of the "dell" database is required.
