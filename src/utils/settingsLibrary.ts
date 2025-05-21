@@ -1,20 +1,46 @@
-import { getCache } from 'memcachelibrarybeta';
-import { SettingsService } from 'src/settings/settings.service';
-import { GlobalService } from './global.service';
+import settingsConfig from 'app/configs/settingsConfig';
+import axios from 'app/store/axiosService';
+import LocalCache from './localCache';
 
-export class SettingsLibrary {
-  constructor(private readonly settingsService: SettingsService) {}
+export const getSettings = async (key: string) => {
+	let tenantId = localStorage.getItem("tenant_id");
+	if(!tenantId) {
+		throw new Error('No tenant id available');
+	}
+	let setting = await LocalCache.getItem(`${tenantId}_${key}`, 'settings');
+	if(!setting || (setting && (setting?.version !== settingsConfig.version))) {
+		const dbSetting = await axios.request({
+			url: `/settings/single?key=${key}`
+		}).then(response => response?.data?.data)
+		if(dbSetting) {
+			await LocalCache.setItem(`${tenantId}_${key}`, { ...dbSetting, version: settingsConfig.version }, 'settings');
+		}
+		setting = dbSetting;
+	}
+	return setting;
+};
 
-  async getSettings(key: string): Promise<any> {
-    const settingKey = 'setting_' + key;
-    console.log(settingKey, 'settingKeeyyyyyyy');
+export const updateSettings = async (AsSetting: any) => {
+	const response = await axios.request({
+		url: `/settings/update?key=${AsSetting.key}`,
+		method: 'patch',
+		data: {
+			//AsKey: AsSetting.key,
+			AsSetting
+		}
+	});
+	if(response?.data?.data?.version) {
+		settingsConfig.version = response.data.data.version
+	}
+	return response?.data;
+};
 
-    const cb = () => {
-      return this.settingsService.findOneByKey(
-        GlobalService.accountId,
-        settingKey,
-      );
-    };
-    return getCache(settingKey, cb);
-  }
+export const getRoleType = async (roleName: string, roleType:string, acl:any) => {
+	const response = await axios.request({
+		url: 'role',
+		method: 'post',
+		data:{
+			roleName, roleType, acl
+		}
+	})
 }
