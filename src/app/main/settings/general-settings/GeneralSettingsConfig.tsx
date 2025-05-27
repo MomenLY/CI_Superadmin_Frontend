@@ -9,7 +9,7 @@ import { Navigate } from "react-router";
 const GeneralSettingsConfig = [
     {
         path: 'general-settings',
-        element: <Navigate to="basic-settings"/>
+        element: <Navigate to="basic-settings" />
     },
     {
         path: 'general-settings',
@@ -23,18 +23,6 @@ const GeneralSettingsConfig = [
                 path: 'profile-settings',
                 element: <ProfileSettings />
             },
-            {
-                path: 'timezone-settings',
-                element: <TimezoneSettings />
-            },
-            {
-                path: 'storage-CDN-settings',
-                element: <StorageCDNSettings />
-            },
-            {
-                path: 'website-settings',
-                element: <WebsiteSettings />
-            }
         ]
     }
 ]

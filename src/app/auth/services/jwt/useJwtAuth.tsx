@@ -117,7 +117,10 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 
 	const handleSignInSuccess = useCallback(async (userData: User, accessToken: string, enforcePasswordReset?: boolean) => {
 
-		if (userData?.role === 'admin') {
+		const _user: any = userData;
+
+		if (_user.role === 'admin') {
+
 			setSession(accessToken);
 			_setUser(userData)
 
@@ -131,17 +134,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 			setIsAuthenticated(false);
 			setUser(null);
 		}
-
-
-
-		// if (enforcePasswordReset === true) {
-		// 	setTimeout(() => history.push('/reset-password'), 0);
-		// 	setUser(userData);
-		// } else {
-		// 	setIsAuthenticated(true);
-		// 	setUser(userData);
-		// 	onSignedIn(userData);
-		// }
 
 	}, []);
 	/**
@@ -199,8 +191,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 		if (accessToken) {
 			try {
 				const decoded = jwtDecode<JwtPayload>(accessToken);
-				// const currentTime = Date.now() / 1000;
-				// return decoded.exp > currentTime;
 				return true;
 			} catch (error) {
 				return false;
@@ -226,7 +216,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 					const _user = User?.data?.user;
 					const userData: any = {
 						uuid: _user.uuid,
-						// role: _user.role ? (_user.role === 'endUser' ? 'user' : 'admin') : (_user.roles[0]?.roleType === 'endUser' ? 'user' : 'admin'),
 						role: 'admin',
 						roles: _user.roles ? _user.roles : [],
 						roleAcl: _user.roleAcl ? _user.roleAcl : "",
@@ -237,11 +226,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 							email: _user.data.email,
 						},
 					}
-					// let enforcePasswordReset;
-
-					// if (User?.data?.user?.data?.enforcePasswordReset === 1) {
-					// 	setTimeout(() => history.push('/reset-password'), 0);
-					// }
 					handleSignInSuccess(userData, accessToken, enforcePasswordReset);
 					return true;
 				} catch (error) {
@@ -312,7 +296,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 		response.then(
 			(res: AxiosResponse<{ user: User }>) => {
 				const userData = res?.data?.user;
-				// handleSignUpSuccess(userData);
 				return userData;
 			},
 			(error) => {
@@ -337,6 +320,8 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 		setEnforcePasswordReset(null)
 		setUser(null);
 		await LocalCache.deleteItem(cacheIndex.userData);
+		await LocalCache.deleteItem(cacheIndex.userProfile);
+		await LocalCache.deleteItem(cacheIndex.settings);
 		onSignedOut();
 		localStorage.removeItem(cacheIndex.userRoleId);
 		window.location.href = "/sign-in";
@@ -376,26 +361,6 @@ const useJwtAuth = <User, SignInPayload, SignUpPayload>(
 	 */
 	const refreshToken = async () => {
 
-		// const accesstoken = getAccessToken();
-		// setIsLoading(true);
-		// try {
-		//  //const response: AxiosResponse<string> = await axios.post(authConfig.tokenRefreshUrl);
-
-		//  //const accessToken = response?.headers?.['New-Access-Token'] as string;
-		//  const accessToken = accesstoken;
-
-		//  if (accessToken) {
-		//      setSession(accessToken);
-		//      return accessToken;
-		//  }
-
-		//  return null;
-		// } catch (error) {
-		//  const axiosError = error as AxiosError;
-
-		//  handleError(axiosError);
-		//  return axiosError;
-		// }
 	};
 
 	/**

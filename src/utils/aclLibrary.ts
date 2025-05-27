@@ -2,6 +2,7 @@ import { getRoleModules, getUserSession } from "app/shared-components/cache/cach
 import LocalCache from "./localCache";
 import { cacheIndex } from "app/shared-components/cache/cacheIndex";
 
+
 export const getModuleAccessRules = async (module: string, _access?: string) => {
     const response = {
         error: false,
@@ -11,16 +12,8 @@ export const getModuleAccessRules = async (module: string, _access?: string) => 
     };
 
     //fetch feature restriction for the account
-    const userData = await LocalCache.getItem(cacheIndex.userData, getUserSession.bind(null));
-
-    const modules = await LocalCache.getItem(
-        (
-            userData?.role === 'admin' ? cacheIndex.roleModulesAdmin : cacheIndex.roleModulesEndUser),
-        getRoleModules.bind(null, userData.role)
-    );
-
-
-    // console.log(modules, "modules")
+    const userData = await getUserSession();
+    const modules = await getRoleModules(userData.role || 'admin');
 
     //check module name is valid and if so, assign to a variable
     if (typeof modules[module] === "undefined") {
@@ -87,7 +80,7 @@ export const getModuleAccessRules = async (module: string, _access?: string) => 
         * 2. Module access that is connected with any featureKey and that feature is available for the account
         */
 
-        const moduleAccessObject = {};
+        const moduleAccessObject: any = {};
         Object.entries(moduleObject["accessRules"]).map(([accessKey, accessRule]: [string, any]) => {
             if (!accessRule.connectedFeature || (accessRule.connectedFeature && checkFeatureAvailability(features, accessRule.connectedFeature))) {
                 moduleAccessObject[accessKey] = {
@@ -101,8 +94,8 @@ export const getModuleAccessRules = async (module: string, _access?: string) => 
     return response;
 }
 
-const checkFeatureAvailability = (feature, featureKey) => {
-    if (typeof feature === "undefined" || typeof feature[featureKey] === undefined) {
+const checkFeatureAvailability = (feature: any, featureKey: any) => {
+    if (typeof feature[featureKey] === undefined) {
         return false;
     } else {
         return feature[featureKey]?.active;

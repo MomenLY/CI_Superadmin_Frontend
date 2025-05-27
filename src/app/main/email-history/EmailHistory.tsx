@@ -3,10 +3,6 @@ import { styled } from '@mui/material/styles';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .FusePageSimple-header': {
-		// backgroundColor: theme.palette.background.paper,
-		// borderBottomWidth: 1,
-		// borderStyle: 'solid',
-		// borderColor: theme.palette.divider
 	},
 	'& .FusePageSimple-content': {},
 	'& .FusePageSimple-sidebarHeader': {},
@@ -14,7 +10,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 }));
 
 function EmailHistory() {
-	
+
 
 	return (
 		<Root
@@ -25,7 +21,7 @@ function EmailHistory() {
 			}
 			content={
 				<div className="p-24">
-					
+
 				</div>
 			}
 		/>

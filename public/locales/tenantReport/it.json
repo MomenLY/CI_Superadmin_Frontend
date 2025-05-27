@@ -1,0 +1,12 @@
+{
+    "expo_code": "Codice Expo",
+    "expo_name": "Nome Expo",
+    "start_date": "Data Inizio",
+    "end_date": "Data Fine",
+    "expo_price": "Prezzo Expo",
+    "expo_type": "Tipo di Expo",
+    "status": "Stato",
+    "registred_count": "Conteggio Registrati",
+    "expo_mode": "Modalità Expo",
+    "exp_creator": "Creatore Expo"
+}

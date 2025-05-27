@@ -13,16 +13,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch } from 'app/store/hooks';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import firebase from 'firebase/compat/app';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Form Validation Schema
  */
 const schema = z.object({
-	email: z.string().email('You must enter a valid email').nonempty('You must enter an email'),
+	email: z.string().email('youMustEnterAValidEmail').nonempty('youMustEnterAnEmail'),
 	password: z
 		.string()
-		.min(4, 'Password is too short - must be at least 4 chars.')
-		.nonempty('Please enter your password.')
+		.min(4, 'passwordMinLengthMessage')
+		.nonempty('passwordRequiredMessage')
 });
 
 type FormType = {
@@ -40,7 +41,7 @@ const defaultValues = {
 function FirebaseSignInTab() {
 	const { firebaseService } = useAuth();
 	const dispatch = useAppDispatch();
-
+	const { t } = useTranslation();
 	const { control, formState, handleSubmit, setValue, setError } = useForm<FormType>({
 		mode: 'onChange',
 		defaultValues,

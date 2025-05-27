@@ -10,7 +10,7 @@ const SettingsConfig = {
     routes: [
         {
          path: 'admin/settings',
-         element: <Navigate to="/admin/settings/general-settings/basic-settings"/>
+         element: <Navigate to="/admin/settings/general-settings/profile-settings"/>
         },
         {
          path: 'admin/settings',

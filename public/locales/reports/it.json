@@ -1,0 +1,8 @@
+{
+    "tenant_id": "ID Inquilino",
+    "tenant_name": "Nome Inquilino",
+    "total_expo": "Totale Expo",
+    "completed_expo": "Expo Completati",
+    "ongoing_expo": "Expo in Corso",
+    "upcoming_export": "Expo in Arrivo"
+}

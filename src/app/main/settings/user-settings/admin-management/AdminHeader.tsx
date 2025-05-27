@@ -16,7 +16,6 @@ function AdminHeader({ setKeyword, keyword }: Props) {
                 searchKeyword={keyword}
                 setSearchKeyword={setKeyword}
                 buttonLabel={t('Add')}
-                // button={rules?.addRole?.permission}
                 buttonUrl='new'
             />
         </div>

@@ -117,7 +117,7 @@ function LoginSignupSettingsContent() {
 				onSubmit={handleSubmit(onSubmit)}
 				autoComplete="off"
 			>
-				<Controller
+				{/* <Controller
 					name="signup"
 					control={control}
 					render={({ field }) => (
@@ -145,7 +145,7 @@ function LoginSignupSettingsContent() {
 							</RadioGroup>
 						</FormControl>
 					)}
-				/>
+				/> */}
 
 				<Controller
 					name="signin"
@@ -226,11 +226,11 @@ function LoginSignupSettingsContent() {
 						</FormControl>
 					)}
 				/>
-				<Header
+				{/* <Header
 					label={t('socialMediaLogin')}
 					content={t('socialMediaLoginHelperText')}
-				/>
-				<Controller
+				/> */}
+				{/* <Controller
 					name="isGoogle"
 					control={control}
 					render={({ field: { onChange, value } }) => (
@@ -246,8 +246,8 @@ function LoginSignupSettingsContent() {
 							/>
 						</FormControl>
 					)}
-				/>
-				<Controller
+				/> */}
+				{/* <Controller
 					name="isFacebook"
 					control={control}
 					render={({ field: { onChange, value } }) => (
@@ -263,8 +263,8 @@ function LoginSignupSettingsContent() {
 							/>
 						</FormControl>
 					)}
-				/>
-				<Controller
+				/> */}
+				{/* <Controller
 					name="isApple"
 					control={control}
 					render={({ field: { onChange, value } }) => (
@@ -280,12 +280,13 @@ function LoginSignupSettingsContent() {
 							/>
 						</FormControl>
 					)}
-				/>
+				/> */}
 				<div className="flex md:w-1/2 justify-end mt-16 ">
 					<Button
 						type="submit"
+						className="mx-4 rounded-[10px] font-medium uppercase"
 						variant="contained"
-						color="secondary"
+						color="primary"
 						disabled={isLoading}
 					>
 						{isLoading === true ? <CircularProgress size={25} color='inherit' /> : t("save")}

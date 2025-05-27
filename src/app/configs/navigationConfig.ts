@@ -5,12 +5,12 @@ import { FuseNavItemType } from '@fuse/core/FuseNavigation/types/FuseNavItemType
  */
 const navigationConfig: FuseNavItemType[] = [
 	{
-		id: 'dashboard',
-		title: 'Dashboard',
-		translate: 'Dashboard',
+		id: 'accounts',
+		title: 'Accounts',
+		translate: 'Accounts',
 		type: 'item',
-		icon: 'material-outline:dashboard',
-		url: 'admin/dashboard'
+		icon: 'material-outline:contacts',
+		url: 'admin/accounts'
 	},
 	{
 		id: 'users',
@@ -21,36 +21,20 @@ const navigationConfig: FuseNavItemType[] = [
 		url: 'admin/users'
 	},
 	{
-		id: 'accounts',
-		title: 'Accounts',
-		translate: 'Accounts',
-		type: 'item',
-		icon: 'material-outline:contacts',
-		url: 'admin/accounts'
-	},
-	{
-		id: 'plan-management',
-		title: 'Plan Management',
-		translate: 'Plan Management',
-		type: 'item',
-		icon: 'material-outline:card_membership',
-		url: 'admin/plan-management'
-	},
-	{
-		id: 'email-history',
-		title: 'Email History',
-		translate: 'Email History',
-		type: 'item',
-		icon: 'material-outline:email',
-		url: 'admin/email-history'
-	},
-	{
 		id: 'settings',
 		title: 'Settings',
 		translate: 'Settings',
 		type: 'item',
 		icon: 'material-outline:settings',
 		url: 'admin/settings'
+	},
+	{
+		id: 'report',
+		title: 'Report',
+		translate: 'Report',
+		type: 'item',
+		icon: 'material-outline:feed',
+		url: 'admin/report'
 	},
 ];
 

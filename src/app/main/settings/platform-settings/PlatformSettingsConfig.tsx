@@ -8,20 +8,12 @@ import { Navigate } from "react-router";
 const PlatformSettingsConfig = [
 	{
 		path: 'platform-settings',
-		element: <Navigate to="layout-settings"/>
+		element: <Navigate to="password-settings" />
 	},
 	{
 		path: 'platform-settings',
 		element: <PlatformSettings />,
 		children: [
-			{
-				path: 'layout-settings',
-				element: <LayoutSettings />
-			},
-			{
-				path: 'login-signup-settings',
-				element: <LoginSignupSettings />
-			},
 			{
 				path: 'password-settings',
 				element: <PasswordSettings />

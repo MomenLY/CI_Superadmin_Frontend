@@ -111,7 +111,7 @@ function DataTable<TData>(
           showProgressBars: true
         },
         layoutMode: "semantic",
-        enableRowSelection: true,
+        enableRowSelection: false,
         enableFullScreenToggle: false,
         enableGrouping: false,
         enableColumnPinning: false,
@@ -123,7 +123,7 @@ function DataTable<TData>(
         enableColumnOrdering: false,
         enableColumnFilterModes: false,
         enableDensityToggle: false,
-        enableBatchRowSelection: true,
+        enableBatchRowSelection: false,
         displayColumnDefOptions: { 'mrt-row-actions': { size: 10 } },
         muiBottomToolbarProps: {
           className: "flex items-center min-h-56 h-56",

@@ -28,6 +28,15 @@ export default defineConfig({
 	],
 	build: {
 		outDir: 'build',
+		rollupOptions: {
+			onwarn(warning, warn) {
+				// skip certain warnings
+				if (warning.code === 'UNSUPPORTED_CSS_PROPERTY') return;
+				// Use default for everything else
+				warn(warning);
+			}
+		},
+		target: 'esnext',
 	},
 	server: {
 		open: true,

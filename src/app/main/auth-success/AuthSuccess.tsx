@@ -28,10 +28,6 @@ function AuthSuccess() {
     window.location.href = "sign-in"
   }
 
-  // useEffect(() => {
-  //   processUserRole();
-  // }, []);
-
   useEffect(() => {
     if (!_token) {
       localStorage.removeItem(cacheIndex.userRoleId);

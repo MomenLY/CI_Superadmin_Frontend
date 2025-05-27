@@ -1,0 +1,8 @@
+{
+	"tenant_id": "Tenant ID",
+	"tenant_name": "Tenant Name",
+	"total_expo": "Total Expo",
+	"completed_expo": "Completed Expo",
+	"ongoing_expo": "Ongoing Expo",
+	"upcoming_export": "Upcoming Expo"
+}

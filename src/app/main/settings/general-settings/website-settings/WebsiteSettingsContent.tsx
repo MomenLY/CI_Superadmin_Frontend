@@ -228,7 +228,7 @@ function WebsiteSettingsContent() {
 								autoFocus
 								type="email"
 								error={!!errors.contactEmail}
-								helperText={errors?.contactEmail?.message}
+								helperText={t(errors?.contactEmail?.message)}
 								variant="outlined"
 								fullWidth
 							/>
@@ -347,7 +347,7 @@ function WebsiteSettingsContent() {
 									autoFocus
 									type="link"
 									error={!!errors.instagramLink}
-									helperText={errors?.instagramLink?.message}
+									helperText={t(errors?.instagramLink?.message)}
 									variant="outlined"
 									fullWidth
 								/>
@@ -390,7 +390,7 @@ function WebsiteSettingsContent() {
 									autoFocus
 									type="link"
 									error={!!errors.youtubeLink}
-									helperText={errors?.youtubeLink?.message}
+									helperText={t(errors?.youtubeLink?.message)}
 									variant="outlined"
 									fullWidth
 								/>
@@ -433,7 +433,7 @@ function WebsiteSettingsContent() {
 									autoFocus
 									type="link"
 									error={!!errors.linkedInLink}
-									helperText={errors?.linkedInLink?.message}
+									helperText={t(errors?.linkedInLink?.message)}
 									variant="outlined"
 									fullWidth
 								/>

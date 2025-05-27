@@ -5,21 +5,27 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { selectUser } from 'src/app/auth/user/store/userSlice';
 import { useAuth } from 'src/app/auth/AuthRouteProvider';
 import { darken } from '@mui/material/styles';
 import { useAppSelector } from 'app/store/hooks';
+import LocalCache from 'src/utils/localCache';
+import { cacheIndex } from 'app/shared-components/cache/cacheIndex';
+import { userImageUrl } from 'src/utils/urlHelper';
+import { getUserSession } from 'app/shared-components/cache/cacheCallbacks';
+import { userUpdateSelector } from 'src/app/main/settings/general-settings/profile-settings/ProfileSettingsSlice';
 
 /**
  * The user menu.
  */
 function UserMenu() {
-	const user = useAppSelector(selectUser);
 	const { signOut } = useAuth();
+	const [user, setUser] = useState();
 	const [userMenu, setUserMenu] = useState<HTMLElement | null>(null);
+	const state = userUpdateSelector((state) => state.state.value)
 
 	const userMenuClick = (event: React.MouseEvent<HTMLElement>) => {
 		setUserMenu(event.currentTarget);
@@ -29,8 +35,17 @@ function UserMenu() {
 		setUserMenu(null);
 	};
 
-	if (!user) {
-		return null;
+	useEffect(() => {
+		getUserDetails();
+	}, [state]);
+
+	const getUserDetails = async () => {
+		const user = await LocalCache.getItem(cacheIndex.userData, getUserSession.bind(null));
+		if (user) {
+			setUser(user)
+		} else {
+			return null
+		}
 	}
 
 	return (
@@ -45,28 +60,19 @@ function UserMenu() {
 						component="span"
 						className="flex font-semibold"
 					>
-						{user.data.displayName}
+						{user && user?.data?.displayName}
 					</Typography>
 					<Typography
 						className="text-11 font-medium capitalize"
 						color="text.secondary"
 					>
-						{user.role?.toString()}
-						{(!user.role || (Array.isArray(user.role) && user.role.length === 0)) && 'Guest'}
+						{'Admin'}
+						{/* {(user && user.roleId[0] === import.meta.env.VITE_SUPER_ADMIN_ROLE_ID) ? 'Superadmin' : 'Admin'} */}
+						{/* {(user && !user.roles || (Array.isArray(user.roles) && user.roles.length === 0)) && 'Guest'} */}
 					</Typography>
 				</div>
 
-				{user.data.photoURL ? (
-					<Avatar
-						sx={{
-							background: (theme) => theme.palette.background.default,
-							color: (theme) => theme.palette.text.secondary
-						}}
-						className="md:mx-4"
-						alt="user photo"
-						src={user.data.photoURL}
-					/>
-				) : (
+				{(user && (user?.data?.userImage === 'default.webp' || user?.data?.userImage === '' || user?.data?.userImage === null)) ? (
 					<Avatar
 						sx={{
 							background: (theme) => darken(theme.palette.background.default, 0.05),
@@ -74,8 +80,17 @@ function UserMenu() {
 						}}
 						className="md:mx-4"
 					>
-						{user?.data?.displayName?.[0]}
+						{user?.data?.displayName ? user?.data?.displayName?.[0].toUpperCase() : 'U'}
 					</Avatar>
+				) : (
+					<Avatar
+						sx={{
+							background: (theme) => darken(theme.palette.background.default, 0.05),
+							color: (theme) => theme.palette.text.secondary
+						}}
+						className="md:mx-4"
+						src={user && userImageUrl(user.data.userImage)}
+					/>
 				)}
 			</Button>
 
@@ -95,7 +110,7 @@ function UserMenu() {
 					paper: 'py-8'
 				}}
 			>
-				{!user.role || user.role.length === 0 ? (
+				{user && (!user.role || user.role.length === 0) ? (
 					<>
 						<MenuItem
 							component={Link}
@@ -113,7 +128,7 @@ function UserMenu() {
 							role="button"
 						>
 							<ListItemIcon className="min-w-40">
-								<FuseSvgIcon>heroicons-outline:user-add </FuseSvgIcon>
+								<FuseSvgIcon>heroicons-outline:user-add </FuseSvgIcon>123
 							</ListItemIcon>
 							<ListItemText primary="Sign up" />
 						</MenuItem>

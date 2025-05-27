@@ -15,8 +15,6 @@ import { showMessage } from "@fuse/core/FuseMessage/fuseMessageSlice";
 import { useAppDispatch } from "app/store/hooks";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-// import { RoleSelectorAPI } from '../apis/Role-Selector-Api';
-// import { AddUserAPI } from '../apis/Add-User-Api';
 import { useCallback, useEffect, useState } from 'react';
 import { debounce } from 'lodash';
 import { UpdateUserAPI } from 'src/app/main/users/apis/Update-User-Api';
@@ -64,10 +62,7 @@ function UpdateAdminForm() {
 	const getUserData = async () => {
 		const User = await GetUserAPI({ id: routeParams.id });
 		setUserData(User?.data);
-
-
 	};
-
 
 	const GetAllAdmins = useCallback(
 		debounce(async () => {
@@ -89,7 +84,6 @@ function UpdateAdminForm() {
 	const { isValid, dirtyFields, errors } = formState;
 
 	useEffect(() => {
-		// GetAllAdmins();
 		getUserData();
 		GetAllAdmins();
 	}, []);
@@ -125,7 +119,6 @@ function UpdateAdminForm() {
 			const response = await UpdateUserAPI({ data });
 			const result = response?.data;
 			if (result) {
-				// updateLocalCache(result);
 				handleUpdate();
 				dispatch(setShouldUpdate(true))
 
@@ -134,7 +127,6 @@ function UpdateAdminForm() {
 			const errorMesssage = err?.response?.data?.message;
 			if (errorMesssage) {
 				dispatch(showMessage({ message: errorMesssage || 'User already exists', variant: 'error' }));
-				// navigate('/users');
 				setIsLoading((prev) => !prev);
 			}
 		}

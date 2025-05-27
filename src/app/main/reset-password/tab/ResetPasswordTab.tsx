@@ -48,10 +48,9 @@ function ResetPasswordTab() {
 	const { jwtService } = useAuth();
 
 	// Get specific user details
-	// const userRole = useSelector(selectUserRole);
 	const userSettings = useSelector(selectUserSettings);
-	const userRole_ = useSelector((state:any) => state.userList.userRole);
-	const userRole = useSelector((state:any)=> state.userList.loggedUser)
+	const userRole_ = useSelector((state: any) => state.userList.userRole);
+	const userRole = useSelector((state: any) => state.userList.loggedUser)
 
 	const getPasswordData = async () => {
 		const passwordData = await SettingsApi({ settingsKey: 'password' })
@@ -60,14 +59,9 @@ function ResetPasswordTab() {
 		};
 	};
 
-	console.log(userRole_,"from userRole reduer");
-	
-	console.log(userRole.role,"logged user from loggedReducer");
-	
-
 	useEffect(() => {
 		getPasswordData();
-	},[])
+	}, [])
 
 	const schema = z
 		.object({
@@ -78,10 +72,10 @@ function ResetPasswordTab() {
 				.regex(prevData?.requireMinimumOneCapitalLetter ? /[A-Z]/ : /(?:)/, prevData?.requireMinimumOneCapitalLetter && { message: `${t('passwordMustIncludeAtLeastOneCapitalLetter')}` })
 				.regex(prevData?.requireMinimumOneNumerical ? /[0-9]/ : /(?:)/, prevData?.requireMinimumOneNumerical && { message: `${t('passwordMustIncludeAtLeastANumerical')}` })
 				.regex(prevData?.requireMinimumOneSpecialCharacter ? /[!@#$%^&*(),.?":{}|<>]/ : /(?:)/, prevData?.requireMinimumOneSpecialCharacter && { message: `${t('passwordMustIncludeAtLeastASpecialCharacter')}` }),
-			passwordConfirm: z.string().nonempty(`${t('passwordConfirmationIsRequired')}`)
+			passwordConfirm: z.string().nonempty('passwordConfirmationIsRequired')
 		})
 		.refine((data) => data.password === data.passwordConfirm, {
-			message: `${t('mustMatchTheAbovePassword')}`,
+			message: 'mustMatchTheAbovePassword',
 			path: ['passwordConfirm']
 		});
 
@@ -229,7 +223,7 @@ function ResetPasswordTab() {
 								label={`${t('password')}(${t('confirm')})`}
 								type="password"
 								error={!!errors.passwordConfirm}
-								helperText={errors?.passwordConfirm?.message}
+								helperText={t(errors?.passwordConfirm?.message)}
 								variant="outlined"
 								required
 								fullWidth

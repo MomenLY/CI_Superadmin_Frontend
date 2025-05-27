@@ -4,9 +4,6 @@ import axios from "app/store/axiosService";
 import LocalCache from "src/utils/localCache";
 
 export const userProfileUpdate = async ({ data }) => {
-  // Extracting the first name and last name
-
-
   // date format
   const dobDate = new Date(data.formData.dob);
   const standardDate: string = dobDate.toISOString();
@@ -17,6 +14,7 @@ export const userProfileUpdate = async ({ data }) => {
       method: "patch",
       data: {
         firstName: data?.formData?.firstName,
+        lastName: data?.formData?.lastName,
         email: data?.formData?.email,
         dateOfBirth: standardDate,
         gender: data?.formData?.gender,
@@ -43,3 +41,15 @@ export const getUserDetailsByIdAPI = async ({ id }) => {
     return error;
   }
 };
+
+export const getUserById = async (id) => {
+  try {
+    const response = await axios.request({
+      url: `/users/${id}`,
+      method: 'get',
+    })
+    return response?.data?.data
+  } catch (e) {
+    console.log(e)
+  }
+}

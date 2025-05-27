@@ -36,8 +36,7 @@ export const addRoleAPI = async ({ roleName, roleType }) => {
     const response = await axios.post('/role', {
       name: roleName,
       roleType: roleType,
-      acl: acl,
-      areIsDefault: areIsDefault
+      acl: acl
     });
     return response.data;
   } catch (error) {

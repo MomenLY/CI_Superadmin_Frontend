@@ -22,7 +22,7 @@ type FusePageSimpleSidebarProps = {
  */
 const FusePageSimpleSidebar = forwardRef<{ toggleSidebar: (T: boolean) => void }, FusePageSimpleSidebarProps>(
 	(props, ref) => {
-		const { open = true, position, variant, onClose = () => {} } = props;
+		const { open = true, position, variant, onClose = () => { } } = props;
 
 		const [isOpen, setIsOpen] = useState(open);
 
@@ -45,7 +45,7 @@ const FusePageSimpleSidebar = forwardRef<{ toggleSidebar: (T: boolean) => void }
 						variant="temporary"
 						anchor={position}
 						open={isOpen}
-						onOpen={() => {}}
+						onOpen={() => { }}
 						onClose={() => onClose()}
 						disableSwipeToOpen
 						classes={{
@@ -60,7 +60,6 @@ const FusePageSimpleSidebar = forwardRef<{ toggleSidebar: (T: boolean) => void }
 						ModalProps={{
 							keepMounted: true // Better open performance on mobile.
 						}}
-						// container={rootRef.current}
 						BackdropProps={{
 							classes: {
 								root: 'FusePageSimple-backdrop'

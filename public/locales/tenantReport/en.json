@@ -1,0 +1,12 @@
+{
+	"expo_code": "Expo Code",
+	"expo_name": "Expo Name",
+	"start_date": "Start Date",
+	"end_date": "End Date",
+	"expo_price": "Expo Pricing",
+	"expo_type": "Expo Type",
+	"status": "Status",
+	"registred_count": "Registered Count",
+	"expo_mode":"Expo Mode",
+	"exp_creator":"Expo Creator"
+}

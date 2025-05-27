@@ -1,10 +1,15 @@
 import OnionSearch from './OnionSearch'
-import { Button, Typography } from '@mui/material'
+import { Breadcrumbs, Button, Typography } from '@mui/material'
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon'
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import NavLinkAdapter from '@fuse/core/NavLinkAdapter';
-
+import { Link } from 'react-router-dom';
+import OnionBreadcrumb, { LinkType } from './OnionBreadcrumbs';
+interface CustomButton {
+    key: string;
+    component: React.ReactNode;
+}
 type CustomHeaderType = {
     button?: boolean;
     search?: boolean;
@@ -16,6 +21,9 @@ type CustomHeaderType = {
     buttonUrl?: string;
     buttonIcon?: string;
     enableButtonIcon?: boolean;
+    customButtons?: CustomButton[];
+    breadcrumbLinks?: LinkType[];
+    breadcrumbCurrent?: string;
 }
 
 function OnionCustomHeader({
@@ -28,12 +36,16 @@ function OnionCustomHeader({
     label,
     buttonUrl,
     buttonIcon,
-    enableButtonIcon = true
+    enableButtonIcon = true,
+    customButtons = [],
+    breadcrumbLinks = [],
+    breadcrumbCurrent,
 }: CustomHeaderType) {
     const { t } = useTranslation();
 
     return (
         <div className="flex flex-col  w-full ">
+           {breadcrumbCurrent && breadcrumbLinks.length > 0 && <OnionBreadcrumb links={breadcrumbLinks} current={breadcrumbCurrent} />}
             <div className='flex flex-col sm:flex-row space-y-16 sm:space-y-0 flex-1 w-full items-center justify-between'>
                 <div className="flex items-center">
                     <motion.span
@@ -48,15 +60,18 @@ function OnionCustomHeader({
                 </div>
                 <div className='flex flex-col w-full sm:w-auto sm:flex-row space-y-16 sm:space-y-0 flex-1 items-center justify-end space-x-8'>
                     {search && <OnionSearch searchLabel={searchLabel ? searchLabel : t('search')} keyword={searchKeyword} setKeyword={setSearchKeyword} />}
+                    {customButtons.map((button) => (
+                        <div key={button.key}>{button.component}</div>
+                    ))}
                     <div className=''>
                         <motion.span
                             initial={{ y: -20 }}
                             animate={{ y: 0, transition: { delay: 0.2 } }}
                         >
                             {button && <Button
-                                className="mr-8 md:ml-5"
+                                className="mx-4 rounded-[10px] font-medium uppercase"
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 component={NavLinkAdapter}
                                 to={buttonUrl ? buttonUrl : "new"}
                             >

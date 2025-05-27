@@ -55,10 +55,6 @@ function AuthRouteProvider(props: AuthProviderProps) {
 	 * Get user role from store
 	 */
 	const userRole = useAppSelector(selectUserRole);
-	// const userRolex = useSelector((state) => state.userList.userRole);
-
-// const userRole = useSelector((state)=>state.userList.userRole)
-// console.log(userRolex,"from redux");
 
 	/**
 	 * Jwt auth service
@@ -96,7 +92,7 @@ function AuthRouteProvider(props: AuthProviderProps) {
 	});
 	const { enforcePasswordReset } = jwtService;
 
-	
+
 
 	/**
 	 * Firebase auth service

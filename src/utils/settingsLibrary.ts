@@ -4,15 +4,15 @@ import LocalCache from './localCache';
 
 export const getSettings = async (key: string) => {
 	let tenantId = localStorage.getItem("tenant_id");
-	if(!tenantId) {
+	if (!tenantId) {
 		throw new Error('No tenant id available');
 	}
 	let setting = await LocalCache.getItem(`${tenantId}_${key}`, 'settings');
-	if(!setting || (setting && (setting?.version !== settingsConfig.version))) {
+	if (!setting || (setting && (setting?.version !== settingsConfig.version))) {
 		const dbSetting = await axios.request({
 			url: `/settings/single?key=${key}`
 		}).then(response => response?.data?.data)
-		if(dbSetting) {
+		if (dbSetting) {
 			await LocalCache.setItem(`${tenantId}_${key}`, { ...dbSetting, version: settingsConfig.version }, 'settings');
 		}
 		setting = dbSetting;
@@ -29,17 +29,17 @@ export const updateSettings = async (AsSetting: any) => {
 			AsSetting
 		}
 	});
-	if(response?.data?.data?.version) {
+	if (response?.data?.data?.version) {
 		settingsConfig.version = response.data.data.version
 	}
 	return response?.data;
 };
 
-export const getRoleType = async (roleName: string, roleType:string, acl:any) => {
+export const getRoleType = async (roleName: string, roleType: string, acl: any) => {
 	const response = await axios.request({
 		url: 'role',
 		method: 'post',
-		data:{
+		data: {
 			roleName, roleType, acl
 		}
 	})

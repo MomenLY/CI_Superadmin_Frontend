@@ -34,16 +34,16 @@ function ForgotPasswordTab() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const schema = z.object({
-        email: z.string().nonempty(`${t('youMustEnterAValidEmail')}`).email(`${t('youMustEnterAnEmail')}`)
+        email: z.string().nonempty('youMustEnterAValidEmail').email('youMustEnterAnEmail')
     });
 
-    const { control, formState, handleSubmit, reset, setError,getValues } = useForm({
+    const { control, formState, handleSubmit, reset, setError, getValues } = useForm({
         mode: 'onChange',
         defaultValues,
         resolver: zodResolver(schema)
     });
 
-    const handleUpdate = useDebounce((data:any) => {
+    const handleUpdate = useDebounce((data: any) => {
         dispatch(showMessage({ message: data?.message || `${t('resetLinkSendInToYourEmail')}`, variant: 'success' }));
         setTimeout(() => {
             navigate('/sign-in')
@@ -54,10 +54,10 @@ function ForgotPasswordTab() {
     const { isValid, dirtyFields, errors } = formState;
 
     const handleClickAway = () => {
-		if(getValues().email === '') {
-			reset();
-		}
-	}
+        if (getValues().email === '') {
+            reset();
+        }
+    }
 
     async function onSubmit(formData: FormType) {
         const { email } = formData;
@@ -73,10 +73,9 @@ function ForgotPasswordTab() {
             const errorMesssage = error?.response?.data?.message
             if (errorMesssage) {
                 dispatch(showMessage({ message: errorMesssage || `${t('emailIsNotFound')}`, variant: 'error', autoHideDuration: 3000 }));
-                setError('email', { type: 'email' })   
+                setError('email', { type: 'email' })
             }
             setIsLoading((prev) => !prev)
-            //reset(defaultValues);
         }
     }
 
@@ -94,58 +93,58 @@ function ForgotPasswordTab() {
             <div className="mt-2 flex items-baseline font-medium">
                 <Typography>{t('fillTheFormToResetYourPassword')}</Typography>
             </div>
-            <ClickAwayListener onClickAway={()=>handleClickAway()}>
-            <form
-                name="registerForm"
-                noValidate
-                spellCheck={false}
-                className="mt-32 flex w-full flex-col justify-center"
-                onSubmit={handleSubmit(onSubmit)}
-                autoComplete="off"
-            >
-                <Controller
-                    name="email"
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            className="mb-24"
-                            label={t('email')}
-                            type="email"
-                            error={!!errors.email}
-                            helperText={errors?.email?.message}
-                            variant="outlined"
-                            required
-                            fullWidth
-                        />
-                    )}
-                />
-
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className=" mt-4 w-full"
-                    aria-label="Register"
-                    disabled={_.isEmpty(dirtyFields) || !isValid || isLoading}
-                    type="submit"
-                    size="large"
+            <ClickAwayListener onClickAway={() => handleClickAway()}>
+                <form
+                    name="registerForm"
+                    noValidate
+                    spellCheck={false}
+                    className="mt-32 flex w-full flex-col justify-center"
+                    onSubmit={handleSubmit(onSubmit)}
+                    autoComplete="off"
                 >
-                    {isLoading === true ? <CircularProgress size={25} color='inherit' /> : t('sendResetLink')}
-                </Button>
+                    <Controller
+                        name="email"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                className="mb-24"
+                                label={t('email')}
+                                type="email"
+                                error={!!errors.email}
+                                helperText={t(errors?.email?.message)}
+                                variant="outlined"
+                                required
+                                fullWidth
+                            />
+                        )}
+                    />
 
-                <Typography
-                    className="mt-32 text-md font-medium"
-                    color="text.secondary"
-                >
-                    <span>{t('returnTo')}</span>
-                    <Link
-                        className="ml-4"
-                        to="/sign-in"
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        className=" mt-4 w-full"
+                        aria-label="Register"
+                        disabled={_.isEmpty(dirtyFields) || !isValid || isLoading}
+                        type="submit"
+                        size="large"
                     >
-                        {t('signIn')}
-                    </Link>
-                </Typography>
-            </form>
+                        {isLoading === true ? <CircularProgress size={25} color='inherit' /> : t('sendResetLink')}
+                    </Button>
+
+                    <Typography
+                        className="mt-32 text-md font-medium"
+                        color="text.secondary"
+                    >
+                        <span>{t('returnTo')}</span>
+                        <Link
+                            className="ml-4"
+                            to="/sign-in"
+                        >
+                            {t('signIn')}
+                        </Link>
+                    </Typography>
+                </form>
             </ClickAwayListener>
         </div>
     );

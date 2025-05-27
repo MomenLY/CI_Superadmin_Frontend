@@ -3,16 +3,11 @@ import { alpha, styled } from '@mui/material/styles';
 import ListItemText from '@mui/material/ListItemText';
 import clsx from 'clsx';
 import { useMemo } from 'react';
-import { ListItemButton, ListItemButtonProps } from '@mui/material';
+import { ListItemButton } from '@mui/material';
 import FuseNavBadge from '../../FuseNavBadge';
 import FuseSvgIcon from '../../../FuseSvgIcon';
-import { FuseNavItemComponentProps } from '../../FuseNavItem';
 
-type ListItemButtonStyleProps = ListItemButtonProps & {
-	itempadding: number;
-};
-
-const Root = styled(ListItemButton)<ListItemButtonStyleProps>(({ theme, ...props }) => ({
+const Root = styled(ListItemButton)(({ theme, ...props }:any) => ({
 	minHeight: 44,
 	width: '100%',
 	borderRadius: '6px',
@@ -21,42 +16,62 @@ const Root = styled(ListItemButton)<ListItemButtonStyleProps>(({ theme, ...props
 	paddingLeft: props.itempadding > 80 ? 80 : props.itempadding,
 	paddingTop: 10,
 	paddingBottom: 10,
-	color: alpha(theme.palette.text.primary, 0.7),
+	// color: alpha(theme.palette.text.primary, 0.7),
+	color: "theme.palette.text.primary",
 	cursor: 'pointer',
 	textDecoration: 'none!important',
 	'&:hover': {
 		color: theme.palette.text.primary
 	},
 	'&.active': {
-		color: theme.palette.text.primary,
-		backgroundColor:
-			theme.palette.mode === 'light' ? 'rgba(0, 0, 0, .05)!important' : 'rgba(255, 255, 255, .1)!important',
-		pointerEvents: 'none',
+		// color: theme.palette.text.primary,
+		//color: theme.palette.mode === 'light' ? theme.palette.common.white: theme.palette.primary.main,
+		// color: "red",
+		color: theme.palette.name === 'custom' ? theme.palette.sideNav.textColor : theme.palette.text.primary,
+
+
+
+		backgroundColor: theme.palette.name === 'custom' ? (
+			theme.palette.mode === 'light' ? theme.palette.sideNav.backgroundColor : theme.palette.sideNav.backgroundColor
+		) : (
+			theme.palette.mode === 'light' ? 'rgba(0, 0, 0, .05)!important' : 'rgba(255, 255, 255, .1)!important'
+		),
+
+		//  theme.palette.mode === 'light' ? 'rgba(0, 0, 0, .05)!important' : 'rgba(255, 255, 255, .1)!important',
+
+		// pointerEvents: 'none',
 		transition: 'border-radius .15s cubic-bezier(0.4,0.0,0.2,1)',
 		'& > .fuse-list-item-text-primary': {
-			color: 'inherit'
+			color: 'inherit',
 		},
 		'& > .fuse-list-item-icon': {
-			color: 'inherit'
-		}
+			// color: 'inherit'
+			color: theme.palette.name === 'custom' ? theme.palette.sideNav.textColor : theme.palette.text.primary,
+		},
+		'& .fuse-list-item-text-primary': {
+			fontWeight: '600 !important',
+		},
 	},
 	'& >.fuse-list-item-icon': {
 		marginRight: 16,
 		color: 'inherit'
 	},
-	'& > .fuse-list-item-text': {}
+	'& > .fuse-list-item-text': {},
+	'&.disabled': {
+		pointerEvents: 'none',
+		cursor: 'default',
+		opacity: 0.5,
+		color: theme.palette.text.disabled,
+	},
 }));
 
 /**
  * FuseNavVerticalItem is a React component used to render FuseNavItem as part of the Fuse navigational component.
  */
-function FuseNavVerticalItem(props: FuseNavItemComponentProps) {
+function FuseNavVerticalItem(props) {
 	const { item, nestedLevel = 0, onItemClick, checkPermission } = props;
-
 	const itempadding = nestedLevel > 0 ? 38 + nestedLevel * 16 : 16;
-
 	const component = item.url ? NavLinkAdapter : 'li';
-
 	let itemProps = {};
 
 	if (typeof component !== 'string') {
@@ -76,8 +91,8 @@ function FuseNavVerticalItem(props: FuseNavItemComponentProps) {
 		() => (
 			<Root
 				component={component}
-				className={clsx('fuse-list-item', item.active && 'active')}
-				onClick={() => onItemClick && onItemClick(item)}
+				className={clsx('fuse-list-item', item.active && 'active', item.disabled && 'disabled')}
+				onClick={() => !item.disabled && onItemClick && onItemClick(item)}
 				itempadding={itempadding}
 				sx={item.sx}
 				{...itemProps}
@@ -108,5 +123,4 @@ function FuseNavVerticalItem(props: FuseNavItemComponentProps) {
 }
 
 const NavVerticalItem = FuseNavVerticalItem;
-
 export default NavVerticalItem;

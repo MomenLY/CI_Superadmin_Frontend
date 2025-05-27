@@ -24,6 +24,7 @@ import { useUsersSelector } from './UsersSlice';
 type Props = {
     keyword?: string;
     setKeyword?: (data: string) => void;
+    rules?: any;
 };
 
 const defaultValues = {
@@ -43,7 +44,7 @@ const schema = z.object({
     shouldSendEmail: z.boolean()
 });
 
-function UsersTable({ keyword, setKeyword }: Props) {
+function UsersTable({ keyword, setKeyword ,rules}: Props) {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
@@ -119,6 +120,16 @@ function UsersTable({ keyword, setKeyword }: Props) {
             ),
         },
         {
+            accessorKey: "role",
+            header: `${t('roleName')}`,
+            enableSorting: false,
+            Cell: ({ row }) => (
+                <Typography>
+                    {row.original.role}
+                </Typography>
+            ),
+        },
+        {
             accessorKey: "email",
             header: `${t('email')}`,
             Cell: ({ row }) => (
@@ -138,7 +149,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                 }
 
                 const dataTableLocalConfig = await LocalCache.getItem(
-                    `dataTableLocalConfig_${user.uuid}`
+                    `dataTableLocalConfigUser_${user.uuid}`
                 );
                 const dataTableLocalConfigProcessed = dataTableLocalConfig ? dataTableLocalConfig : {};
                 cachedTableData.current = dataTableLocalConfigProcessed;
@@ -180,7 +191,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                         pagination: pagination.pageSize,
                     }
                     await LocalCache.setItem(
-                        `dataTableLocalConfig_${user.uuid}`,
+                        `dataTableLocalConfigUser_${user.uuid}`,
                         cachedTableData.current
                     );
                 }
@@ -215,7 +226,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                     columnOrder: columnOrder,
                 }
                 await LocalCache.setItem(
-                    `dataTableLocalConfig_${user.uuid}`,
+                    `dataTableLocalConfigUser_${user.uuid}`,
                     cachedTableData.current
                 );
             } catch (error) {
@@ -232,7 +243,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                     columnVisibility: columnVisibility,
                 }
                 await LocalCache.setItem(
-                    `dataTableLocalConfig_${user.uuid}`,
+                    `dataTableLocalConfigUser_${user.uuid}`,
                     cachedTableData.current
                 );
             } catch (error) {
@@ -290,6 +301,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                 }
                 if (response?.data?.items) {
                     setUsers(response?.data?.items);
+                    console.log(response?.data?.items)
                 }
 
                 if (response.data?.meta) {
@@ -367,16 +379,32 @@ function UsersTable({ keyword, setKeyword }: Props) {
 
     return (
         <>
-            <GlobalStyles
+               <GlobalStyles
                 styles={() => ({
-                    '#root': {
-                        maxHeight: '100vh'
-                    }
+                    "#root": {
+                        maxHeight: "100vh",
+                    },
+                    "& .MuiTableCell-root": {
+                        fontSize: "12px !important",
+                        fontWeight: "600 !important",
+                        color: "text.primary",
+                    },
+                    "& .MuiTableCell-root .MuiTypography-root": {
+                        fontSize: "13px !important",
+                        fontWeight: "400 !important",
+                        color: "text.primary",
+                    },
                 })}
             />
             <Paper
-                className="flex flex-col flex-auto shadow-3 rounded-4 overflow-hidden h-full "
+                className=" overflow-auto w-full h-full"
                 elevation={0}
+                sx={{
+                    border: "none",
+                    margin: "0",
+                    boxShadow: "0px 1px 6px 0px rgba(0,0,0,0.2) !important",
+                    padding: "0",
+                }}
             >
                 <Dialog
                     open={resetPasswordDialog}
@@ -471,6 +499,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                     renderRowActionMenuItems={({ closeMenu, row, table }) => [
                         <MenuItem
                             key={0}
+                            disabled={!rules?.deleteUser?.permission}
                             onClick={() =>
                                 dispatch(
                                     openDialog({
@@ -494,6 +523,7 @@ function UsersTable({ keyword, setKeyword }: Props) {
                         </MenuItem>,
                         <MenuItem
                             key={1}
+                            disabled={!rules?.editUser?.permission}
                             onClick={() => {
                                 navigate(`edit/${row.original._id}`);
                                 closeMenu();

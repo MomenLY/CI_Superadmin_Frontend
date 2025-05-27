@@ -79,9 +79,9 @@ function PasswordSettingsContent() {
   const schema = z.object({
     passwordRange: z
       .string()
-      .min(1, `${t("pleaseEnterAPasswordRange")}`)
+      .min(1, "pleaseEnterAPasswordRange")
       .refine((value) => parseInt(value) >= 6, {
-        message: `${t("defaultPasswordRangeMustHaveAMinimumValueOf6")}`,
+        message: "defaultPasswordRangeMustHaveAMinimumValueOf6",
       }),
     requireMinimumOneNumerical: z.boolean(),
     resetPasswordAfterFirstLogin: z.boolean(),
@@ -92,7 +92,7 @@ function PasswordSettingsContent() {
     .string()
     .min(1)
     .refine((value) => !/\s/.test(value), {
-      message: 'Password should not contain spaces',
+      message: 'passwordNoSpaceMessage',
     })
   });
 
@@ -339,7 +339,7 @@ function PasswordSettingsContent() {
                     }}
                     placeholder="6"
                     error={!!errors.passwordRange}
-                    helperText={errors?.passwordRange?.message}
+                    helperText={t(errors?.passwordRange?.message)}
                   />
                 </FormControl>
               )}
@@ -435,7 +435,7 @@ function PasswordSettingsContent() {
                 label={t("defaultPassword")}
                 type="text"
                 error={!!errors.defaultPasswordSetByAdmin}
-                helperText={errors?.defaultPasswordSetByAdmin?.message}
+                helperText={t(errors?.defaultPasswordSetByAdmin?.message)}
                 variant="outlined"
                 required
                 fullWidth
@@ -473,8 +473,9 @@ function PasswordSettingsContent() {
           <div className="flex md:w-1/2 justify-end mt-16 ">
             <Button
               type="submit"
+              className="mx-4 rounded-[10px] font-medium uppercase"
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={isLoading}
             >
               {isLoading === true ? (

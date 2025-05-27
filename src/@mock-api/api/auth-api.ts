@@ -31,7 +31,6 @@ export const authApiMocks = (mock: ExtendedMockAdapter) => {
 			const _user = userData?.data?.data?.user;
 			const user = {
 				uuid: _user.uuid,
-				// role: _user.role ? _user.role : (_user.roles[0]?.roleType === 'endUser' ? 'user' : 'admin'),
 				role: 'admin',
 				roles: _user.roles ? _user.roles : [],
 				roleAcl: _user.roleAcl ? _user.roleAcl : "",
@@ -109,12 +108,6 @@ export const authApiMocks = (mock: ExtendedMockAdapter) => {
 	mock.onPost('/auth/refresh').reply((config) => {
 		const newTokenResponse = generateAccessToken(config);
 
-		// if (newTokenResponse) {
-		// 	const { access_token } = newTokenResponse;
-
-		// 	return [200, null, { 'New-Access-Token': access_token }];
-		// }
-
 		const error = 'Invalid access token detected or user not found';
 
 		return [401, { data: error }];
@@ -184,7 +177,6 @@ export const authApiMocks = (mock: ExtendedMockAdapter) => {
 			}
 
 			if (error.length === 0) {
-				// delete (user as Partial<UserAuthType>).password;
 				const response = {
 					user,
 					message

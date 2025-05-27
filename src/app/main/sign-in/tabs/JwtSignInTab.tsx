@@ -11,11 +11,12 @@ import { Link } from 'react-router-dom';
 import { useAuth } from 'src/app/auth/AuthRouteProvider';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
+import { CircularProgress, ClickAwayListener, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from 'app/store/hooks';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { SettingsApi } from '../../sign-up/apis/Settings-Api';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 type FormType = {
 	email: string;
@@ -48,19 +49,20 @@ function jwtSignInTab() {
 	const [permission, setPermission] = useState<PrevPermissionData>();
 	const [signUpEnabled, setSignUpEnabled] = useState('true');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const schema = z.object({
 		email: z
 			.string()
-			.email(`${t('youMustEnterAValidEmail')}`)
-			.nonempty(`${t('youMustEnterAnEmail')}`),
+			.email('youMustEnterAValidEmail')
+			.nonempty('youMustEnterAnEmail'),
 		password: z
 			.string()
-			.nonempty(`${t('enterYourPassword')}`)
-			.min(1, `${t('passwordMustBeAtLeast')} 1 ${t('characters')}`)
+			.nonempty(`passwordRequiredMessage`)
+			.min(4, `passwordMinLengthMessage`)
 	});
 
-	const { control, formState, handleSubmit, getValues, setError, clearErrors,reset } = useForm<FormType>({
+	const { control, formState, handleSubmit, getValues, setError, clearErrors, reset } = useForm<FormType>({
 		mode: 'onChange',
 		defaultValues,
 		resolver: zodResolver(schema)
@@ -75,7 +77,7 @@ function jwtSignInTab() {
 	};
 
 	const handleClickAway = () => {
-		if(getValues().email === '' && getValues().password === '') {
+		if (getValues().email === '' && getValues().password === '') {
 			reset();
 		}
 	}
@@ -100,7 +102,7 @@ function jwtSignInTab() {
 				email,
 				password
 			}).then((data) => {
-				
+				console.log(data.data.user.roleId)
 			})
 			.catch(
 				(
@@ -145,6 +147,16 @@ function jwtSignInTab() {
 		}
 	}, [getValues().email, getValues().password]);
 
+	const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+	};
+
+	const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+	};
+
 	return (
 		<div className="mx-auto w-full max-w-320 sm:mx-0 sm:w-320">
 			<img
@@ -168,96 +180,112 @@ function jwtSignInTab() {
 				</div>
 			)} */}
 			<div className="w-full">
-			<ClickAwayListener onClickAway={()=>handleClickAway()}>
-				<form
-					name="loginForm"
-					noValidate
-					spellCheck={false}
-					className="mt-32 flex w-full flex-col justify-center space-y-5"
-					onSubmit={handleSubmit(onSubmit)}
-				>
-					<Controller
-						name="email"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								className="mb-16"
-								label={t('email')}
-								autoFocus
-								type="email"
-								error={!!errors.email}
-								helperText={errors?.email?.message}
-								variant="outlined"
-								required
-								fullWidth
-							/>
-						)}
-					/>
-
-					<Controller
-						name="password"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								// className="mb-16"
-								label={t('password')}
-								type="password"
-								error={!!errors.password}
-								helperText={errors?.password?.message}
-								variant="outlined"
-								required
-								fullWidth
-							/>
-						)}
-					/>
-					<div className="flex flex-col items-center justify-center sm:flex-row sm:justify-between !mt-20 !mb-10">
+				<ClickAwayListener onClickAway={() => handleClickAway()}>
+					<form
+						name="loginForm"
+						noValidate
+						spellCheck={false}
+						className="mt-32 flex w-full flex-col justify-center space-y-5"
+						onSubmit={handleSubmit(onSubmit)}
+					>
 						<Controller
-							name="remember"
+							name="email"
 							control={control}
 							render={({ field }) => (
-								<FormControl>
-									<FormControlLabel
-										label={t('rememberMe')}
-										control={
-											<Checkbox
-												size="small"
-												{...field}
-											/>
-										}
-									/>
-								</FormControl>
+								<TextField
+									{...field}
+									className="mb-16"
+									label={t('email')}
+									autoFocus
+									type="email"
+									error={!!errors.email}
+									helperText={t(errors?.email?.message)}
+									variant="outlined"
+									required
+									fullWidth
+								/>
 							)}
 						/>
 
-						<Link
-							className="text-md font-medium"
-							to="/forgot-password"
-						>
-							{t('forgotPassword')}
-						</Link>
-					</div>
-
-					<Button
-						variant="contained"
-						color="secondary"
-						className=" mt-16 w-full"
-						aria-label="Sign in"
-						disabled={_.isEmpty(dirtyFields) || !isValid || isLoading}
-						type="submit"
-						size="large"
-					>
-						{isLoading === true ? (
-							<CircularProgress
-								size={25}
-								color="inherit"
+						<Controller
+							name="password"
+							control={control}
+							render={({ field }) => (
+								<FormControl className="w-full md:max-w-[335px]" variant="outlined" error={!!errors.password}>
+									<InputLabel htmlFor="outlined-adornment-password">
+										{t('password')}
+									</InputLabel>
+									<OutlinedInput
+										{...field}
+										id="outlined-adornment-password"
+										type={showPassword ? 'text' : 'password'}
+										label={t('password')}
+										error={!!errors.password}
+										endAdornment={
+											<InputAdornment position="end">
+												<IconButton
+													aria-label="toggle password visibility"
+													onClick={handleClickShowPassword}
+													onMouseDown={handleMouseDownPassword}
+													onMouseUp={handleMouseUpPassword}
+													edge="end"
+												>
+													{showPassword ? <Visibility /> : <VisibilityOff />}
+												</IconButton>
+											</InputAdornment>
+										}
+									/><FormHelperText>
+										{t(errors?.password?.message)}
+									</FormHelperText>
+								</FormControl>
+							)}
+						/>
+						<div className="flex flex-col items-center justify-center sm:flex-row sm:justify-between !mt-20 !mb-10">
+							<Controller
+								name="remember"
+								control={control}
+								render={({ field }) => (
+									<FormControl>
+										<FormControlLabel
+											label={t('rememberMe')}
+											control={
+												<Checkbox
+													size="small"
+													{...field}
+												/>
+											}
+										/>
+									</FormControl>
+								)}
 							/>
-						) : (
-							t('signIn')
-						)}
-					</Button>
-				</form>
+
+							<Link
+								className="text-md font-medium"
+								to="/forgot-password"
+							>
+								{t('forgotPassword')}
+							</Link>
+						</div>
+
+						<Button
+							variant="contained"
+							color="secondary"
+							className=" mt-16 w-full"
+							aria-label="Sign in"
+							disabled={_.isEmpty(dirtyFields) || !isValid || isLoading}
+							type="submit"
+							size="large"
+						>
+							{isLoading === true ? (
+								<CircularProgress
+									size={25}
+									color="inherit"
+								/>
+							) : (
+								t('signIn')
+							)}
+						</Button>
+					</form>
 				</ClickAwayListener>
 				{/* <div className="mt-32 flex items-center space-x-16">
 					<Button

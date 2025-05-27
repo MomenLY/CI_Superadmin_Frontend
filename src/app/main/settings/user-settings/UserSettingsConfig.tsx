@@ -41,18 +41,6 @@ const UserSettingsConfig = [
 					element: <EditForm />
 				}]
 			},
-			{
-				path:'admin-management',
-				element: <AdminManagement/>,
-				children:[{
-					path:':id',
-					element: <AdminForm/>
-				},
-				{
-					path:'edit/:id',
-					element: <UpdateAdminForm/>
-				}]
-			}
 		]
 	}
 ];

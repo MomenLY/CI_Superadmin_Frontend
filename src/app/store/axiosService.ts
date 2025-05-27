@@ -7,7 +7,7 @@ let baseUrl = import.meta.env.VITE_DB_URL;
 
 const axiosClient = axios.create({
   baseURL: baseUrl, // Base URL for API requests
-  timeout: 5000, // Request timeout in milliseconds
+  timeout: 150000, // Request timeout in milliseconds
   headers: {
     "Content-Type": "application/json", // Set default content type
     "x-tenant-id": 'dell',

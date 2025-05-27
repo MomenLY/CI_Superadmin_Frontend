@@ -4,9 +4,7 @@ import { Navigate } from 'react-router-dom';
 import settingsConfig from 'app/configs/settingsConfig';
 import { FuseRouteConfigsType, FuseRoutesType } from '@fuse/utils/FuseUtils';
 import SignInConfig from '../main/sign-in/SignInConfig';
-import SignUpConfig from '../main/sign-up/SignUpConfig';
 import SignOutConfig from '../main/sign-out/SignOutConfig';
-// import Error404Page from '../main/404/Error404Page';
 import DashboardConfig from '../main/dashboard/DashboardConfig';
 import AccountsConfig from '../main/accounts/AccountsConfig';
 import PlanManagementConfig from '../main/plan-management/PlanManagementConfig';
@@ -18,8 +16,8 @@ import UsersConfig from '../main/users/UsersConfig';
 import ResetPasswordConfig from '../main/reset-password/ResetPasswordConfig';
 import ConfirmationConfig from '../main/confirmation-required/ConfirmationConfig';
 import AdminResetPasswordConfig from '../main/admin-reset-password/AdminResetPasswordConfig';
-// import AuthSuccessConfig from '../main/auth-success/AuthSuccessConfig';
 import UserDashboardConfig from '../main/user-dashboard/userDashboardConfig';
+import ReportConfig from '../main/report/ReportConfig';
 
 
 const routeConfigs: FuseRouteConfigsType = [
@@ -31,14 +29,13 @@ const routeConfigs: FuseRouteConfigsType = [
 	UsersConfig,
 	SignOutConfig,
 	SignInConfig,
-	// SignUpConfig,
 	ConfirmationConfig,
 	ForgotPasswordConfig,
 	ResetPasswordConfig,
 	Error404PageConfig,
 	AdminResetPasswordConfig,
-	// AuthSuccessConfig,
-	UserDashboardConfig
+	UserDashboardConfig,
+	ReportConfig
 ];
 
 /**
@@ -48,7 +45,7 @@ const routes: FuseRoutesType = [
 	...FuseUtils.generateRoutesFromConfigs(routeConfigs, settingsConfig.defaultAuth),
 	{
 		path: '/',
-		element: <Navigate to="admin/dashboard" />,
+		element: <Navigate to="admin/accounts" />,
 		auth: settingsConfig.defaultAuth
 	},
 	{

@@ -93,7 +93,6 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
       "/sign-out",
       "/logout",
       "/404",
-      // "/sign-in-success"
     ];
     if (matched && !userHasPermission && !ignoredPaths.includes(pathname)) {
       setSessionRedirectUrl(pathname);
@@ -102,10 +101,6 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
     if (matched && userHasPermission && !ignoredPaths.includes(pathname)) {
       setSessionRedirectUrl(pathname);
       const isRoleDefined = localStorage.getItem(cacheIndex.userRoleId);
-      // if (isRoleDefined === null) {
-      //   setSessionRedirectUrl(pathname);
-      //   window.location.href = "/sign-in-success";
-      // }
     }
 
     /**

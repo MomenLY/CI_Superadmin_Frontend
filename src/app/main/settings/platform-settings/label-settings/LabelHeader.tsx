@@ -39,7 +39,6 @@ function LabelHeader({ searchData, subTitle, title }: Props) {
 							className="flex flex-1 px-16"
 							disableUnderline
 							fullWidth
-							// value={searchText}
 							inputProps={{
 								'aria-label': 'Search'
 							}}

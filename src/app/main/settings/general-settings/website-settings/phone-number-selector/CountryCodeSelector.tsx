@@ -18,16 +18,26 @@ type CountryCodeSelectorProps = {
   className?: string;
 };
 
-const countries = await LocalCache.getItem(cacheIndex.countries, getCountries.bind(this));
 
 const CountryCodeSelector = forwardRef(
   (props: CountryCodeSelectorProps, ref: ForwardedRef<HTMLDivElement>) => {
     const { value, onChange, className } = props;
-    // const { data: countries } = useGetContactsCountriesQuery();
-    //json for country code
-    const country = _.find(countries, { code: value });
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const [countries, setCountries] = useState<any[]>([]);
+    const country = _.find(countries, { code: value });
+
+    React.useEffect(() => {
+      getCountry();
+    }, []);
+
+    const getCountry = async () => {
+      const _countries = await LocalCache.getItem(cacheIndex.countries, getCountries.bind(this));
+      if (_countries.length > 0) {
+        setCountries(_countries);
+      }
+    }
+
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
     };

@@ -63,7 +63,7 @@ const schema = z.object({
   password: z
     .string()
     .nonempty("Please enter your password."),
-    shouldSendEmail: z.boolean()
+  shouldSendEmail: z.boolean()
 });
 
 const defaultValues = {
@@ -71,8 +71,8 @@ const defaultValues = {
   shouldSendEmail: true
 };
 type FormData = {
-	password: string;
-	shouldSendEmail: boolean
+  password: string;
+  shouldSendEmail: boolean
 };
 const ITEM_HEIGHT: number = 48;
 //--------------------------------------
@@ -108,7 +108,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
       children: (
         <OnionConfirmBox
           title={`${userStatuses[status].actionLabel} ${t('user')}`}
-          subTitle={ userStatuses[status].confirmLabel}
+          subTitle={userStatuses[status].confirmLabel}
           onCancel={() => dispatch(closeDialog())}
           onConfirm={() => {
             updateStatusAPI(status);
@@ -129,7 +129,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
         show: user.status !== "Active" || user.status === "Suspended",
         theme: "bg-[#ccf3ed] text-[#00c3a5]",
         textColor: "text.primary",
-        confirmLabel:  t('adminManagement_ActivateConfirmText')
+        confirmLabel: t('adminManagement_ActivateConfirmText')
       },
       Inactive: {
         label: "Inactive",
@@ -139,7 +139,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
         show: user.status !== "Inactive" || user.status === "Suspended",
         theme: "bg-[#ebebeb] text-[#9b9b9b]",
         textColor: "text.disabled",
-        confirmLabel:  t('adminManagement_DeactivateConfirmText')
+        confirmLabel: t('adminManagement_DeactivateConfirmText')
       },
       Suspended: {
         label: "Suspended",
@@ -148,7 +148,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
         message: `${t("suspendedStatus")}`,
         show: user.status === "Active",
         theme: "bg-[#fee9d6] text-[#f89233]",
-        confirmLabel:  t('adminManagement_SuspendConfirmText')
+        confirmLabel: t('adminManagement_SuspendConfirmText')
       },
       resetPassword: {
         label: "Reset Password",
@@ -174,10 +174,9 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
     setAnchorEl(null);
   };
 
-  const resetPasswordAPI = async (id: string, password?: string, shouldSendEmail:boolean) => {
+  const resetPasswordAPI = async (id: string, password?: string, shouldSendEmail: boolean) => {
     await updateDefaultPassword(id, password, shouldSendEmail);
     toggleResetPasswordDialog(false)
-    // onUserModify(user);
     dispatch(
       showMessage({
         message: `${t("passwordResetSuccessfully")}`,
@@ -206,7 +205,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
       const result = response?.statusCode;
       if (result) {
         dispatch(showMessage({ message: "User deleted", variant: "success" }));
-        setReload((prev)=>!prev)
+        setReload((prev) => !prev)
       }
     } catch (error) {
       const errorMesssage = error?.response?.data?.message;
@@ -241,8 +240,8 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
 
   const copyPasswordAndEmail = (password: string) => {
     const textToCopy = `Email: ${user?.email}\nPassword: ${password}`;
-  
-    
+
+
     navigator.clipboard.writeText(textToCopy).then(
       () => {
         dispatch(
@@ -427,7 +426,7 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
                 color="text.disabled"
                 className={`truncate mb-0 text-[13px]`}
               >
-                <OnionEmailViewer email={user?.email}/>
+                <OnionEmailViewer email={user?.email} />
                 {/* {user?.email} */}
               </Typography>
             </div>
@@ -451,8 +450,8 @@ function UserCard({ user, onUserModify, setReload }: AdminCardType) {
               className={`mb-0 flex whitespace-nowrap`}
             >
               {t("phoneNumber")} <span className="mx-4">:</span>  <b className={`truncate block`}>
-                 {user.number ? <OnionPhoneNumberViewer phoneNumber={user.number}/> : "N/A"}
-                  </b>
+                {user.number ? <OnionPhoneNumberViewer phoneNumber={user.number} /> : "N/A"}
+              </b>
             </Typography>
           </div>
 

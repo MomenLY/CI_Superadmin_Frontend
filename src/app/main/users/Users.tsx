@@ -50,7 +50,7 @@ function Users() {
 			}
 			content={
 				<div className="w-full h-full container flex flex-col p-16 md:p-24">
-					<UsersTable keyword={keyword} setKeyword={setKeyword} />
+					<UsersTable keyword={keyword} setKeyword={setKeyword} rules={userRules}/>
 				</div>
 			}
 			rightSidebarContent={<UsersSidebarContent />}

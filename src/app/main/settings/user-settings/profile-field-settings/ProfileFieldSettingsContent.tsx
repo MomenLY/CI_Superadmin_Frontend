@@ -6,11 +6,22 @@ import NavLinkAdapter from '@fuse/core/NavLinkAdapter';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import OnionPageOverlay from 'app/shared-components/components/OnionPageOverlay';
 import { useProfileSelector } from './ProfileFieldSettingsSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getModuleAccessRules } from 'src/utils/aclLibrary';
 
 function ProfileFieldSettingsContent() {
   const { t } = useTranslation();
   const state = useProfileSelector((state) => state.state.value);
+  const [profileFieldSettings, setProfileFieldSettings] = useState<any>();
+
+  useEffect(() => {
+    const init = async () => {
+      const roleRules = await getModuleAccessRules('profileField');
+      setProfileFieldSettings(roleRules.access);
+    }
+    init();
+  }, []);
+
 
   return (
     <OnionPageOverlay>
@@ -29,11 +40,13 @@ function ProfileFieldSettingsContent() {
           <div className="mt-5 md:w-2xl text-base">{t('profileFieldSettings_Content')}</div>
         </div>
         <div className='flex w-full justify-center'>
-          <Button className="mx-8"
+          <Button 
+            className="mx-4 rounded-[10px] font-medium uppercase"
             variant="contained"
-            color="secondary"
+            color="primary"
             component={NavLinkAdapter}
             to={'new'}
+            disabled={!profileFieldSettings?.addProfileField?.permission}
           >
             <FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>
             <span className="mx-8">{t('Add')}</span>

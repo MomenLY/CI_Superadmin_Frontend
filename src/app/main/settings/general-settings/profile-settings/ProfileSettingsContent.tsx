@@ -16,17 +16,25 @@ import { showMessage } from "@fuse/core/FuseMessage/fuseMessageSlice";
 import CountryCodeSelector from "./phone-number-selector/CountryCodeSelector";
 import { selectUser } from "../../../../auth/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getUserDetailsByIdAPI, userProfileUpdate } from "./apis/UserAPI";
+import { getUserById, getUserDetailsByIdAPI, userProfileUpdate } from "./apis/UserAPI";
 import { COUNTRIES } from "./store/countries";
 import GeneralSettingsHeader from "../GeneralSettingsHeader";
 import Header from "../basic-settings/Header";
 import { useEffect, useState } from "react";
 import OnionPageOverlay from "app/shared-components/components/OnionPageOverlay";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import LocalCache from "src/utils/localCache";
+import { cacheIndex } from "app/shared-components/cache/cacheIndex";
+import { getUserProfile, getUserSession } from "app/shared-components/cache/cacheCallbacks";
+import { setState, useProfileDispatch } from "../../user-settings/profile-field-settings/ProfileFieldSettingsSlice";
+import { userUpdateSelector } from "./ProfileSettingsSlice";
 
 type FormType = {
   firstName: string;
+  lastName: string;
   email: string;
-  dob: string;
+  dob: Date | null;
   gender: string;
   phoneNumber: string;
   countryCode: string;
@@ -37,6 +45,8 @@ type FormType = {
 function ProfileSettingsContent() {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const dispatchRefresh = useProfileDispatch();
+  const state = userUpdateSelector((state) => state.state.value)
 
   // get user details from session
   const user = useAppSelector(selectUser);
@@ -45,11 +55,29 @@ function ProfileSettingsContent() {
   // schema for user profile
   const schema = z.object({
     firstName: z.string()
-      .min(1, `${t('youMustEnterYourName')}`)
-      .max(50, `${t('pleaseLimitYourInputToAMaximumOf50Characters')}`)
-      .refine(value => value.trim() !== '', { message: `${t('inputCannotBeEmptyOrJustWhitespace')}` }),
-    email: z.string().email(`${t('youMustEnterAValidEmail')}`).nullable(),
-    dob: z.string().nullable(),
+      .min(1, 'youMustEnterYourName')
+      .max(50, 'pleaseLimitYourInputToAMaximumOf50Characters')
+      .refine(value => value.trim() !== '', { message: 'inputCannotBeEmptyOrJustWhitespace' })
+      .refine(
+        (value) => !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(value),
+        { message: 'profile_firstname_url_alert' }
+      ),
+    lastName: z.string()
+      .min(1, 'youMustEnterYourName')
+      .max(50, 'pleaseLimitYourInputToAMaximumOf50Characters')
+      .refine(value => value.trim() !== '', { message: 'inputCannotBeEmptyOrJustWhitespace' })
+      .refine(
+        (value) => !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(value),
+        { message: 'profile_lastname_url_alert' }
+      ),
+    email: z.string().email('youMustEnterAValidEmail').nullable(),
+    dob: z.date()
+      .refine((value) => {
+        const inputDate = new Date(value);
+        const today = new Date();
+        return inputDate <= today;
+      }, { message: 'profile_dob_date_valid' })
+      .nullable(),
     gender: z.string().nullable(),
     country: z.string().nullable(),
     countryCode: z.string().nullable(),
@@ -57,57 +85,56 @@ function ProfileSettingsContent() {
     address: z.string().nullable(),
     phoneNumber: z
       .string()
+      .refine((val) => /^\d+$/.test(val), {
+        message: 'profileAddForm_phoneNumber_onlyDigits',
+      })
+      .refine((val) => !/^\s/.test(val), {
+        message: 'profileAddForm_phoneNumber_noLeadingSpace',
+      })
       .nullable()
   });
 
   //get user details by id
   const getUserDetails = async () => {
-    let response = await getUserDetailsByIdAPI({ id: user.uuid });
-    if (response.data) {
-      setValue("gender", response?.data?.user?.data?.gender);
-      setValue("email", response?.data?.user?.data?.email);
-      setValue("phoneNumber", response?.data?.user?.data?.phoneNumber);
-
-      setValue("address", response?.data?.user?.data?.address);
-      let dateOfBirthStr = response?.data?.user?.data?.dateOfBirth;
-      if (dateOfBirthStr) {
-        // Create a new Date object
-        let dateOfBirth = new Date(dateOfBirthStr);
-        // Format the date as YYYY-MM-DD
-        let year = dateOfBirth.getFullYear();
-        let month = String(dateOfBirth.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-        let day = String(dateOfBirth.getDate()).padStart(2, "0");
-        let formattedDate = `${year}-${month}-${day}`;
-        // Set the value of the date input field
-        setValue("dob", formattedDate);
-      }
-      setValue("firstName", response?.data?.user?.data?.firstName);
-      if (response?.data?.user?.data?.countryCode === null) {
-        setValue("countryCode", "+91");
+    let response = await getUserById(user.uuid);
+    let _user = response
+    if (_user) {
+      setValue("gender", _user?.gender);
+      setValue("email", _user?.email);
+      setValue("phoneNumber", _user?.phoneNumber);
+      setValue("address", _user?.address);
+      setValue("dob", _user?.dateOfBirth ? new Date(_user?.dateOfBirth) : null);
+      setValue("firstName", response?.firstName);
+      setValue("lastName", response?.lastName);
+      if (_user?.data?.countryCode === null) {
+        setValue("countryCode", "+39");
       } else {
-        setValue("countryCode", response?.data?.user?.data?.countryCode);
+        setValue("countryCode", _user?.countryCode);
       }
-      if (response?.data?.user?.data?.country === null) {
+      if (_user?.data?.country === null) {
         setValue("country", "India");
       } else {
-        setValue("country", response?.data?.user?.data?.country);
+        setValue("country", _user?.country);
       }
     }
   };
+
   useEffect(() => {
-    getUserDetails();
-  }, []);
+    if (user.uuid) {
+      getUserDetails();
+    }
+  }, [user.uuid]);
 
   //defaultvalues
   const defaultValues = {
     _id: user.uuid,
     name: "",
     email: "",
-    dob: "",
+    dob: null,
     gender: "",
     phoneNumber: "",
     country: "",
-    countryCode: "+91",
+    countryCode: "+39",
     address: "",
   };
 
@@ -117,6 +144,7 @@ function ProfileSettingsContent() {
     defaultValues,
     resolver: zodResolver(schema),
   });
+
   const { isValid, dirtyFields, errors } = formState;
 
 
@@ -126,14 +154,38 @@ function ProfileSettingsContent() {
     setIsLoading((prev) => !prev);
     try {
       const response = await userProfileUpdate({ data: { formData } });
-
       if (response) {
-        dispatch(
-          showMessage({
-            message: `${t('profileSettingsUpdated')}`,
-            variant: "success",
-          })
-        );
+        if (response.updateCount === 0) {
+          dispatch(
+            showMessage({ message: t('userUpdatePermission'), variant: "info" })
+          );
+
+        } else {
+          dispatch(
+            showMessage({
+              message: `${t('profileSettingsUpdated')}`,
+              variant: "success",
+            })
+          );
+          handleLocalUpdate(formData);
+          const existingData = await LocalCache.getItem(cacheIndex.userData, getUserSession.bind(null));
+
+          const { email, firstName, lastName } = formData;
+
+          if (existingData) {
+            dispatchRefresh(setState(!state));
+            const updatedData = {
+              ...existingData,
+              data: {
+                ...existingData.data,
+                displayName: `${firstName} ${lastName}`,
+                email,
+                userTimeZone: existingData.data.userTimeZone
+              }
+            };
+            await LocalCache.setItem('userData', updatedData);
+          }
+        }
         setIsLoading((prev) => !prev);
       }
     } catch (err) {
@@ -149,6 +201,16 @@ function ProfileSettingsContent() {
       }
       setIsLoading((prev) => !prev);
     }
+  };
+
+  const handleLocalUpdate = async (data: FormType) => {
+    const userProfile: any = await LocalCache.getItem(cacheIndex.userProfile, getUserProfile.bind(this));
+  }
+
+  const shouldDisableDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
   };
 
   return (
@@ -178,9 +240,29 @@ function ProfileSettingsContent() {
                 <TextField
                   {...field}
                   error={!!errors.firstName}
-                  helperText={errors?.firstName?.message}
+                  helperText={t(errors?.firstName?.message)}
                   id="outlined-basic"
                   label={t("firstName")}
+                  variant="outlined"
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </FormControl>
+            )}
+          />
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field }) => (
+              <FormControl>
+                <TextField
+                  {...field}
+                  error={!!errors.lastName}
+                  helperText={t(errors?.lastName?.message)}
+                  id="outlined-basic"
+                  label={t("lastName")}
                   variant="outlined"
                   fullWidth
                   InputLabelProps={{
@@ -198,11 +280,12 @@ function ProfileSettingsContent() {
                 <TextField
                   {...field}
                   error={!!errors.email}
-                  helperText={errors?.email?.message}
+                  helperText={t(errors?.email?.message)}
                   id="outlined-basic"
                   label={t("email")}
                   variant="outlined"
                   fullWidth
+                  disabled
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -210,31 +293,35 @@ function ProfileSettingsContent() {
               </FormControl>
             )}
           />
-          <Controller
-            name="dob"
-            control={control}
-            render={({ field }) => (
-              <FormControl>
-                <TextField
-                  {...field}
-                  error={!!errors.dob}
-                  helperText={errors?.dob?.message}
-                  id="outlined-basic"
-                  variant="outlined"
-                  placeholder=""
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <Controller
+              name="dob"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <DatePicker
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderWidth: '2px',
+                    },
+                  }}
                   label={t("dateOfBirth")}
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
+                  slotProps={{
+                    textField: {
+
+                      helperText: t(errors?.dob?.message),
+                      error: !!errors.dob,
+                      type: 'dob',
+                      variant: 'outlined',
+                      fullWidth: true,
+                    },
                   }}
-                  inputProps={{
-                    max: new Date().toISOString().split("T")[0],
-                  }}
+                  value={value || null}
+                  onChange={onChange}
+                  shouldDisableDate={shouldDisableDate}
                 />
-              </FormControl>
-            )}
-          />
+              )}
+            />
+          </LocalizationProvider>
           <Controller
             name="gender"
             control={control}
@@ -243,7 +330,7 @@ function ProfileSettingsContent() {
                 <FormGroup>
                   <TextField
                     error={!!errors.gender}
-                    helperText={errors?.gender?.message}
+                    helperText={t(errors?.gender?.message)}
                     id="outlined-select-currency"
                     placeholder={t("gender")}
                     label={t("gender")}
@@ -269,7 +356,7 @@ function ProfileSettingsContent() {
                 variant="outlined"
                 fullWidth
                 error={!!errors.phoneNumber}
-                helperText={errors?.phoneNumber?.message}
+                helperText={t(errors?.phoneNumber?.message)}
                 InputProps={{
                   startAdornment: (
                     <Controller
@@ -295,7 +382,7 @@ function ProfileSettingsContent() {
                   <TextField
                     id="outlined-select-currency"
                     error={!!errors.country}
-                    helperText={errors?.country?.message}
+                    helperText={t(errors?.country?.message)}
                     select
                     placeholder={t("country")}
                     label={t("country")}
@@ -321,7 +408,7 @@ function ProfileSettingsContent() {
                 <TextField
                   {...field}
                   error={!!errors.address}
-                  helperText={errors?.address?.message}
+                  helperText={t(errors?.address?.message)}
                   id="outlined-basic"
                   placeholder={t("address")}
                   label={t("address")}
@@ -337,8 +424,9 @@ function ProfileSettingsContent() {
         <div className="flex md:w-2/3 justify-end mt-16 ">
           <Button
             type="submit"
+            className="mx-4 rounded-[10px] font-medium uppercase"
             variant="contained"
-            color="secondary"
+            color="primary"
             disabled={isLoading}
           >
             {isLoading === true ? <CircularProgress size={25} color='inherit' /> : t("save")}
